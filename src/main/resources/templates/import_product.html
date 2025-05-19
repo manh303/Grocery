@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nhập hàng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .product-row {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .btn-add-product {
+            margin-bottom: 20px;
+        }
+        .back-link {
+            text-decoration: none;
+            color: #007bff;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        .back-link:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Nhập hàng</h2>
+        
+        <!-- Thông báo -->
+        <div th:if="${success}" class="alert alert-success" role="alert">
+            <span th:text="${success}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Form nhập hàng -->
+        <form th:action="@{/import-products}" method="post" class="mt-4">
+            <div class="mb-3">
+                <label for="productId" class="form-label">Chọn sản phẩm</label>
+                <select class="form-select" id="productId" name="productId" required>
+                    <option value="">-- Chọn sản phẩm --</option>
+                    <option th:each="product : ${products}"
+                            th:value="${product.id}"
+                            th:text="${product.name + ' (Tồn kho: ' + product.quantityInStock + ')'}">
+                    </option>
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Số lượng nhập</label>
+                <input type="number" class="form-control" id="quantity" name="quantity" min="1" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="note" class="form-label">Ghi chú</label>
+                <textarea class="form-control" id="note" name="note" rows="3"></textarea>
+            </div>
+            
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Nhập hàng</button>
+                <a href="/inventory-history" class="btn btn-info">Xem lịch sử nhập hàng</a>
+                <a href="/" class="btn btn-secondary">Về trang chủ</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function addProductRow() {
+            const container = document.getElementById('productsContainer');
+            const productRow = document.createElement('div');
+            productRow.className = 'product-row';
+            productRow.innerHTML = `
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Sản phẩm</label>
+                            <select class="form-select" name="productIds" required>
+                                <option value="">Chọn sản phẩm</option>
+                                <th:block th:each="product : ${products}">
+                                    <option th:value="${product.id}" th:text="${product.name}"></option>
+                                </th:block>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Số lượng</label>
+                            <input type="number" class="form-control" name="quantities" min="1" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Giá nhập</label>
+                            <input type="number" class="form-control" name="importPrices" min="0" required>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button type="button" class="btn btn-danger form-control" onclick="this.parentElement.parentElement.parentElement.parentElement.remove()">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(productRow);
+        }
+
+        // Thêm sản phẩm đầu tiên khi trang được load
+        document.addEventListener('DOMContentLoaded', function() {
+            addProductRow();
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
